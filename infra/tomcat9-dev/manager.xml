@@ -1,0 +1,5 @@
+<!-- tomcatリロード用の設定 -->
+<Context docBase="/usr/local/tomcat/webapps.dist/manager" antiResourceLocking="false" privileged="true">
+    <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+           allow="127\.\d+\.\d+\.\d+|::1|your-ip-address" />
+</Context>

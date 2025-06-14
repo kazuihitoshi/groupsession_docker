@@ -1,9 +1,43 @@
-version: '3'
 services:
-  app:
-    container_name: tomcat
-    build: ./tomcat9
+  prod:
+    build:
+      context: ./infra/tomcat9
+      dockerfile: Dockerfile
     ports:
       - 8080:8080
+    environment:
+      - TZ=Asia/Tokyo
+      - JAVA_OPTS=-Xms512m -Xmx1024m
     volumes:
-      - ./webapps:/usr/local/tomcat/webapps
+      - ./infra/tomcat9/server.xml:/usr/local/tomcat/conf/server.xml
+      - ./infra/tomcat9/context.xml:/usr/local/tomcat/conf/context.xml
+      - ./infra/tomcat9/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - ./infra/tomcat9/manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
+      - ./:/data/
+  # development
+  # docker compose --profile dev up dev
+  dev:
+    profiles: ["dev"] 
+    build:
+      context: ./infra/tomcat9-dev
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=Asia/Tokyo
+    volumes:
+      - ./infra/tomcat9-dev/server.xml:/usr/local/tomcat/conf/server.xml
+      - ./infra/tomcat9-dev/context.xml:/usr/local/tomcat/conf/context.xml
+      - ./infra/tomcat9-dev/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - ./infra/tomcat9-dev/manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
+      - ./vscode-dev:/data/webapps/ROOT/.vscode
+      - ./ssh-dev:/root/.ssh
+      - ./infra/tomcat9-dev/hotswap-agent.properties:/data/webapps/ROOT/WEB-INF/classes/hotswap-agent.properties
+      - ./:/data/
+      - ./db:/data/webapps/ROOT/WEB-INF/db/
+      - ./file:/data/webapps/ROOT/WEB-INF/file/
+      - ./log/dev/gsession:/data/webapps/ROOT/WEB-INF/log
+      - ./log/dev/tomcat:/usr/local/tomcat/logs
+      - ./log/dev/gsession_msgconf:/data/webapps/ROOT/WEB-INF/msgconf
+      - ./tmp/dev/user-vscode:/root/.vscode
+      - ./tmp/dev/user-vscode-server:/root/.vscode-server
